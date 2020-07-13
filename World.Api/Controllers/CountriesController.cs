@@ -20,7 +20,6 @@
         [EnableQuery]
         public IQueryable<Models.Country> Get() =>
             this.worldDbContext.Countries
-                .AsQueryable()
                 .ProjectTo<Models.Country>(this.mapper.ConfigurationProvider);
 
     }

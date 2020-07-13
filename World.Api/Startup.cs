@@ -9,7 +9,7 @@ namespace World.Api
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
-
+    using Microsoft.OData.Edm;
     using World.Api.Data;
 
     internal class Startup
@@ -18,8 +18,11 @@ namespace World.Api
         {
             serviceCollection.AddDbContext<WorldDbContext>(dbContextOptionsBuilder =>
                 dbContextOptionsBuilder
-                    .UseLoggerFactory(LoggerFactory.Create(loggingBuilder => loggingBuilder.AddDebug().SetMinimumLevel(LogLevel.Information)))
-                    .UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=World;Integrated Security=True;"));
+                    .UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=World;Integrated Security=True;")
+                    .UseLoggerFactory(LoggerFactory.Create(loggingBuilder =>
+                        loggingBuilder
+                            .AddDebug()
+                            .SetMinimumLevel(LogLevel.Information))));
 
             serviceCollection.AddAutoMapper(mapperConfigurationExpression =>
                 {
@@ -29,7 +32,6 @@ namespace World.Api
                 typeof(Startup));
 
 
-            serviceCollection.AddMvc(mvcOptions => mvcOptions.EnableEndpointRouting = false);
             serviceCollection.AddOData();
         }
 
@@ -42,17 +44,22 @@ namespace World.Api
 
             applicationBuilder.UseHttpsRedirection();
 
-            var oDataConventionBuilder = new ODataConventionModelBuilder(applicationBuilder.ApplicationServices);
-            oDataConventionBuilder.EntitySet<Models.Continent>("Continents");
-            oDataConventionBuilder.EntitySet<Models.Country>("Countries");
+            applicationBuilder.UseRouting();
 
-            applicationBuilder.UseMvc(routeBuilder =>
+            applicationBuilder.UseEndpoints(endpointRouteBuilder =>
             {
-                routeBuilder.Select().Expand().Filter().OrderBy().MaxTop(100).Count();
-
-                routeBuilder.MapODataServiceRoute("ODataRoute", "odata", oDataConventionBuilder.GetEdmModel());
-
+                endpointRouteBuilder.MapODataRoute("odata", "odata", getEdmModel(applicationBuilder)).Select().Filter().MaxTop(4);
             });
+
+            static IEdmModel getEdmModel(IApplicationBuilder applicationBuilder)
+            {
+                var oDataConventionBuilder = new ODataConventionModelBuilder(applicationBuilder.ApplicationServices);
+                
+                oDataConventionBuilder.EntitySet<Models.Continent>("Continents");
+                oDataConventionBuilder.EntitySet<Models.Country>("Countries");
+
+                return oDataConventionBuilder.GetEdmModel();
+            }
         }
     }
 }
