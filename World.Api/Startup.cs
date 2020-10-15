@@ -11,6 +11,7 @@ namespace World.Api
     using Microsoft.Extensions.Logging;
     using Microsoft.OData.Edm;
     using World.Api.Data;
+    using System.Linq;
 
     internal class Startup
     {
@@ -27,7 +28,9 @@ namespace World.Api
             serviceCollection.AddAutoMapper(mapperConfigurationExpression =>
                 {
                     mapperConfigurationExpression.CreateMap<World.Data.Entities.Continent, Models.Continent>();
-                    mapperConfigurationExpression.CreateMap<World.Data.Entities.Country, Models.Country>();
+                    mapperConfigurationExpression.CreateMap<World.Data.Entities.Country, Models.Country>()
+                        .ForMember(c => c.Types, opt => opt.MapFrom(x => x.CountryTypes.Select(y => y.Type)));
+                    mapperConfigurationExpression.CreateMap<World.Data.Entities.Type, Models.Type>();
                 },
                 typeof(Startup));
 
@@ -48,7 +51,7 @@ namespace World.Api
 
             applicationBuilder.UseEndpoints(endpointRouteBuilder =>
             {
-                endpointRouteBuilder.MapODataRoute("odata", "odata", getEdmModel(applicationBuilder)).Select().Filter().MaxTop(4);
+                endpointRouteBuilder.MapODataRoute("odata", "odata", getEdmModel(applicationBuilder)).Select().Expand().Count().Filter().MaxTop(4);
             });
 
             static IEdmModel getEdmModel(IApplicationBuilder applicationBuilder)
@@ -57,6 +60,7 @@ namespace World.Api
                 
                 oDataConventionBuilder.EntitySet<Models.Continent>("Continents");
                 oDataConventionBuilder.EntitySet<Models.Country>("Countries");
+                oDataConventionBuilder.EntitySet<Models.Type>("Types");
 
                 return oDataConventionBuilder.GetEdmModel();
             }

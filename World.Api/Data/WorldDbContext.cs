@@ -12,6 +12,18 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<CountryType>().HasKey(t => new { t.CountryId, t.TypeId });
+
+            modelBuilder.Entity<CountryType>()
+                .HasOne(countryType => countryType.Country)
+                .WithMany(country => country.CountryTypes)
+                .HasForeignKey(countryType => countryType.CountryId);
+
+            modelBuilder.Entity<CountryType>()
+                .HasOne(countryType => countryType.Type)
+                .WithMany(type => type.CountryTypes)
+                .HasForeignKey(countryType => countryType.TypeId);
+
             modelBuilder.Entity<Continent>().HasData(
                 new[]
                 {
@@ -74,10 +86,35 @@
                     new Country { Id = 703, Name = "Argentina",     ContinentId = 7 },
                     new Country { Id = 704, Name = "Columbia",      ContinentId = 7 }
                 });
+
+            modelBuilder.Entity<Type>().HasData(
+                new[]
+                {
+                    new Type { Id = 1, Name = "One of eight" },
+                    new Type { Id = 2, Name = "Third world country" },
+                    new Type { Id = 3, Name = "One of EU" }
+                });
+
+            modelBuilder.Entity<CountryType>().HasData(
+                new[]
+                {
+                    new CountryType { CountryId = 101, TypeId = 1 },
+                    new CountryType { CountryId = 101, TypeId = 2 },
+                    new CountryType { CountryId = 101, TypeId = 3 },
+                    new CountryType { CountryId = 102, TypeId = 1 },
+                    new CountryType { CountryId = 103, TypeId = 2 },
+                    new CountryType { CountryId = 301, TypeId = 3 },
+                    new CountryType { CountryId = 302, TypeId = 1 },
+                    new CountryType { CountryId = 303, TypeId = 2 }
+                });
         }
 
         public DbSet<Continent> Continents { get; set; }
 
         public DbSet<Country> Countries { get; set; }
+
+        public DbSet<CountryType> CountryTypes { get; set; }
+
+        public DbSet<Type> Types { get; set; }
     }
 }

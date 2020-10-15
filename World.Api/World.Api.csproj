@@ -13,6 +13,14 @@
     <Compile Remove="Data\Migrations\20200205073816_AddMyProperty.Designer.cs" />
     <Compile Remove="Data\Migrations\20200205084542_Test.cs" />
     <Compile Remove="Data\Migrations\20200205084542_Test.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200917083243_CoiTestShema.cs" />
+    <Compile Remove="Data\Migrations\20200917083243_CoiTestShema.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200917085011_CoiTestShema.cs" />
+    <Compile Remove="Data\Migrations\20200917085011_CoiTestShema.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200917085919_CoiSeedData.cs" />
+    <Compile Remove="Data\Migrations\20200917085919_CoiSeedData.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200917090817_Coiv1.cs" />
+    <Compile Remove="Data\Migrations\20200917090817_Coiv1.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
